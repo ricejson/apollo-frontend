@@ -31,6 +31,9 @@ export const translations = {
     if: '当',
     and: '且',
     or: '或',
+    exportConfig: '导出配置',
+    exportModalTitle: '开关配置预览',
+    download: '下载 JSON',
     attributes: {
       user_id: '用户 ID',
       city: '城市',
@@ -84,6 +87,9 @@ export const translations = {
     if: 'IF',
     and: 'AND',
     or: 'OR',
+    exportConfig: 'Export Config',
+    exportModalTitle: 'Configuration Preview',
+    download: 'Download JSON',
     attributes: {
       user_id: 'User ID',
       city: 'City',
