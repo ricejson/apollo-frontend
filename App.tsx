@@ -4,7 +4,6 @@ import { Toggle, Audience, Language } from './types';
 import { PlusIcon, ZapIcon, LayersIcon, CodeIcon, TrashIcon, DownloadIcon } from './components/Icons';
 import AudienceEditor from './components/AudienceEditor';
 import SdkSnippet from './components/SdkSnippet';
-import { getSmartDescription } from './services/geminiService';
 import { translations } from './translations';
 
 // Mock Storage Key
@@ -18,7 +17,7 @@ const App: React.FC = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [newToggleData, setNewToggleData] = useState({ name: '', key: '' });
+  const [newToggleData, setNewToggleData] = useState({ name: '', key: '', description: '' });
 
   const t = translations[lang];
 
@@ -85,12 +84,11 @@ const App: React.FC = () => {
 
   const handleCreateToggle = async (e: React.FormEvent) => {
     e.preventDefault();
-    const description = await getSmartDescription(newToggleData.name, newToggleData.key);
     const newToggle: Toggle = {
       id: 'tg_' + Math.random().toString(36).substr(2, 9),
       name: newToggleData.name,
       key: newToggleData.key.toLowerCase().replace(/\s+/g, '_'),
-      description: description,
+      description: newToggleData.description,
       status: 'disabled',
       createdAt: new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString().split('T')[0],
@@ -394,7 +392,7 @@ const App: React.FC = () => {
                           required
                           autoFocus
                           className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:outline-none focus:bg-white transition-all font-medium text-gray-900 placeholder:text-gray-300"
-                          placeholder="e.g. New User Dashboard"
+                          placeholder="e.g. user_sign"
                           value={newToggleData.name}
                           onChange={(e) => setNewToggleData({ ...newToggleData, name: e.target.value })}
                       />
@@ -405,9 +403,19 @@ const App: React.FC = () => {
                           type="text"
                           required
                           className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:outline-none focus:bg-white font-mono text-xs transition-all text-gray-900 placeholder:text-gray-300"
-                          placeholder="e.g. new_dashboard_v2"
+                          placeholder="e.g. user_sign toggle"
                           value={newToggleData.key}
                           onChange={(e) => setNewToggleData({ ...newToggleData, key: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5">{t.toggleDescription}</label>
+                      <input
+                          type="text"
+                          required
+                          className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:outline-none focus:bg-white font-mono text-xs transition-all text-gray-900 placeholder:text-gray-300"
+                          value={newToggleData.description}
+                          onChange={(e) => setNewToggleData({ ...newToggleData, description: e.target.value })}
                       />
                     </div>
                     <div className="flex gap-4 pt-4">
