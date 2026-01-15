@@ -37,20 +37,15 @@ ctx := apollo.NewContext(map[string]interface{}{
 if client.IsEnabled("${toggleKey}", ctx) {
     // Grayscale logic here
 }`,
-csharp:`ApolloClient client = new();
-
-var path = Path.Combine(Environment.CurrentDirectory, "toggles");
-client.SetTogglesPath(path);
-
-var user_id = "user_123";
-
-var context = new Dictionary<string, object>
+csharp:`ApolloClient client = new(new ApolloOptions
 {
-    { "user_id", user_id},
-    { "city", "Beijing"}
-};
+    TogglesPath = Path.Combine(Environment.CurrentDirectory, "toggles")
+});
 
-if (client.IsToggleAllow("smart_recommender_v2", user_id, context))
+var context = new ApolloContext("user_123")
+    .Set("city", "Beijing");
+
+if (client.IsToggleAllowed("smart_recommender_v2", context))
 {
     Console.WriteLine("is allow");
 }`
