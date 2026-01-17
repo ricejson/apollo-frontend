@@ -28,15 +28,31 @@ Context context = Context.builder()
 if (client.isEnabled("${toggleKey}", context)) {
     // New feature code
 }`,
-    go: `client := apollo.NewClient("YOUR_KEY")
-ctx := apollo.NewContext(map[string]interface{}{
-    "user_id": "user_123",
-    "city": "Beijing",
-})
+    go: `package main
 
-if client.IsEnabled("${toggleKey}", ctx) {
-    // Grayscale logic here
-}`,
+import (
+	"context"
+	"github.com/ricejson/apollo-sdk-go/client"
+	"github.com/ricejson/apollo-sdk-go/model"
+)
+
+func main() {
+	// 创建客户端实例
+	client := client.NewClient()
+	// 构造condition
+	user := model.NewUser().
+		With("user_id", "123").
+		With("city", "Beijing")
+	// 获取结果
+	allow, err := client.IsToggleAllowV2(context.Background(), "tg_wri5tl24n", "123", user)
+	if err != nil {
+		// 处理错误逻辑
+	}
+	if allow {
+		// 执行业务操作
+	}
+}
+`,
 csharp:`ApolloClient client = new(new ApolloOptions
 {
     TogglesPath = Path.Combine(Environment.CurrentDirectory, "toggles")
