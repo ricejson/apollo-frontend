@@ -4,15 +4,19 @@ FROM node:18-alpine AS builder
 # 设置工作目录
 WORKDIR /app
 
-# 复制 package 文件并安装依赖
+# 安装 Yarn
+RUN npm install -g yarn
+
+# 复制 package 文件和 yarn 锁定文件并安装依赖
 COPY package*.json ./
-RUN npm ci && npm cache clean --force
+COPY yarn.lock ./
+RUN yarn install --frozen-lockfile
 
 # 复制源代码
 COPY . .
 
 # 构建应用
-RUN npm run build
+RUN yarn build
 
 # 生产阶段 - 使用更轻量级的镜像
 FROM nginx:alpine
