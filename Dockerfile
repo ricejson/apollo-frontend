@@ -1,13 +1,12 @@
-# 使用官方 Node.js 镜像作为构建阶段
-FROM node:18-alpine AS builder
+# 1. 修改点：将 node:18 改为 node:20
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# 复制 package 文件
+# 复制依赖定义文件
 COPY package.json yarn.lock ./
 
-# 修改点：使用 yarn 安装依赖
-# --frozen-lockfile 相当于 npm ci，确保版本严格锁定
+# 安装依赖
 RUN yarn install --frozen-lockfile --production && yarn cache clean
 
 # 复制源代码
@@ -16,10 +15,18 @@ COPY . .
 # 构建应用
 RUN npm run build
 
-# 后面保持不变...
+# --- 运行阶段 ---
 FROM nginx:alpine
+
+# 复制 nginx 配置
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# 从构建阶段复制构建产物（注意：请确认你的构建输出目录是 dist 还是 build）
 COPY --from=builder /app/dist /usr/share/nginx/html
+
+# 环境变量
 ENV GEMINI_API_KEY=""
+
 EXPOSE 80
+
 CMD ["nginx", "-g", "daemon off;"]
