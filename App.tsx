@@ -9,6 +9,27 @@ import { translations } from './translations';
 // Mock Storage Key
 const STORAGE_KEY = 'apollo_toggles_data';
 
+// 在文件顶部添加 API 处理逻辑（建议实际项目中移至 api.ts）
+const API_BASE = 'https://apollo-backend-224586-8-1326559147.sh.run.tcloudbase.com'; // 替换为你的后端地址
+
+const api = {
+  // 获取所有开关
+  async getToggles(): Promise<Toggle[]> {
+    const res = await fetch(`${API_BASE}/toggles/all`);
+    if (!res.ok) throw new Error('获取数据失败');
+    return res.json();
+  },
+  // // 更新单个开关
+  // async addToggle(toggle: Toggle): Promise<void> {
+  //   const res = await fetch(`${API_BASE}/toggles/${toggle.id}`, {
+  //     method: 'PUT',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify(toggle),
+  //   });
+  //   if (!res.ok) throw new Error('保存失败');
+  // }
+};
+
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('zh');
   const [toggles, setToggles] = useState<Toggle[]>([]);
@@ -26,39 +47,11 @@ const App: React.FC = () => {
     const loadData = async () => {
       // Simulate network latency
       await new Promise(resolve => setTimeout(resolve, 800));
-
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setToggles(parsed);
-        if (parsed.length > 0) setActiveToggleId(parsed[0].id);
-      } else {
-        // Seed initial data
-        const initialData: Toggle[] = [
-          {
-            id: 'tg_1',
-            name: '智能推荐算法 v2',
-            key: 'smart_recommender_v2',
-            description: '基于用户行为路径的新型推荐引擎，旨在提高点击率。',
-            status: 'enabled',
-            createdAt: '2024-03-20',
-            updatedAt: '2024-03-22',
-            audiences: [
-              {
-                id: 'aud_1',
-                name: '北京/上海核心测试用户',
-                rules: [
-                  { id: 'r1', attribute: 'city', operator: 'in' as any, value: 'Beijing, Shanghai' },
-                  { id: 'r2', attribute: 'traffic', operator: 'lt' as any, value: '20' }
-                ]
-              }
-            ]
-          }
-        ];
-        setToggles(initialData);
-        setActiveToggleId(initialData[0].id);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
-      }
+      // Seed initial data
+      const initialData: Toggle[] = await api.getToggles();
+      const toggles = initialData.Data;
+      setToggles(toggles);
+      setActiveToggleId(toggles[0].id);
       setIsLoading(false);
     };
 
